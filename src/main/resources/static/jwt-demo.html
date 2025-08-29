@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>JWT 인증 테스트</title>
+</head>
+<body>
+  <h2>멤버 가입</h2>
+  <input id="member-username" placeholder="아이디">
+  <input id="member-password" type="password" placeholder="비밀번호">
+  <button onclick="registerMember()">멤버 가입</button>
+  <div id="memberRegisterResult"></div>
+  <h2>어드민 가입</h2>
+  <input id="admin-username" placeholder="아이디">
+  <input id="admin-password" type="password" placeholder="비밀번호">
+  <button onclick="registerAdmin()">어드민 가입</button>
+  <div id="adminRegisterResult"></div>
+  <hr>
+  <h2>로그인</h2>
+  <input id="username" placeholder="아이디">
+  <input id="password" type="password" placeholder="비밀번호">
+  <button onclick="login()">로그인</button>
+  <div id="loginResult"></div>
+  <hr>
+  <h2>엑세스 토큰</h2>
+  <div>AccessToken: <span id="accessToken"></span></div>
+  <hr>
+  <button onclick="whoami()">내 정보(whoami)</button>
+  <div id="whoamiResult"></div>
+  <hr>
+  <button onclick="refreshTokenFunc()">리프레시</button>
+  <div id="refreshResult"></div>
+  <hr>
+  <button onclick="logout()">로그아웃</button>
+  <div id="logoutResult"></div>
+  <script>
+    let accessToken = "";
+
+    function registerMember() {
+      document.getElementById('memberRegisterResult').innerText = '';
+      fetch('http://localhost:8080/api/member/join', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: document.getElementById('member-username').value,
+          password: document.getElementById('member-password').value
+        })
+      })
+      .then(res => res.text())
+      .then(data => document.getElementById('memberRegisterResult').innerText = data)
+      .catch(err => document.getElementById('memberRegisterResult').innerText = '에러: ' + err);
+    }
+
+    function registerAdmin() {
+      document.getElementById('adminRegisterResult').innerText = '';
+      fetch('http://localhost:8080/api/admin/join', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: document.getElementById('admin-username').value,
+          password: document.getElementById('admin-password').value
+        })
+      })
+      .then(res => res.text())
+      .then(data => document.getElementById('adminRegisterResult').innerText = data)
+      .catch(err => document.getElementById('adminRegisterResult').innerText = '에러: ' + err);
+    }
+
+    function login() {
+      document.getElementById('loginResult').innerText = '';
+      fetch('http://localhost:8080/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: document.getElementById('username').value,
+          password: document.getElementById('password').value
+        })
+      })
+      .then(res => {
+        accessToken = res.headers.get('Authorization') || "";
+        document.getElementById('loginResult').innerText = accessToken ? '로그인 완료' : '토큰 없음';
+        document.getElementById('accessToken').innerText = accessToken || '(헤더로 전달됨)';
+        return res.text();
+      })
+      .catch(err => document.getElementById('loginResult').innerText = '에러: ' + err);
+    }
+
+    function whoami() {
+      document.getElementById('whoamiResult').innerText = '';
+      if (!accessToken) {
+        document.getElementById('whoamiResult').innerText = '엑세스 토큰이 없습니다. 로그인 후 이용하세요.';
+        return;
+      }
+      fetch('http://localhost:8080/api/me', {
+        method: 'GET',
+        headers: { 'Authorization': 'Bearer ' + accessToken }
+      })
+      .then(res => res.text())
+      .then(data => document.getElementById('whoamiResult').innerText = data)
+      .catch(err => document.getElementById('whoamiResult').innerText = '에러: ' + err);
+    }
+
+    function refreshTokenFunc() {
+      document.getElementById('refreshResult').innerText = '';
+      fetch('http://localhost:8080/api/reissue', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+        // 쿠키는 브라우저가 자동으로 포함시킴
+      })
+      .then(res => {
+        accessToken = res.headers.get('Authorization') || accessToken;
+        document.getElementById('refreshResult').innerText = accessToken ? '리프레시 완료' : '토큰 없음';
+        document.getElementById('accessToken').innerText = accessToken;
+        return res.text();
+      })
+      .catch(err => document.getElementById('refreshResult').innerText = '에러: ' + err);
+    }
+
+    function logout() {
+      document.getElementById('logoutResult').innerText = '';
+      fetch('http://localhost:8080/logout', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + accessToken }
+      })
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById('logoutResult').innerText = data;
+        accessToken = "";
+        document.getElementById('accessToken').innerText = "";
+      })
+      .catch(err => document.getElementById('logoutResult').innerText = '에러: ' + err);
+    }
+  </script>
+</body>
+</html>

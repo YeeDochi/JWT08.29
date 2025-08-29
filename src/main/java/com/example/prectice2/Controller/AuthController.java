@@ -8,15 +8,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import com.example.prectice2.DTO.JoinResponseDTO;
 import com.example.prectice2.JWT.JwtUtil;
 import com.example.prectice2.Service.AuthService;
 import com.example.prectice2.User.UserEntity;
 import com.example.prectice2.User.UserRepository;
 
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController

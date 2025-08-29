@@ -65,7 +65,7 @@ public class LoginFilters extends UsernamePasswordAuthenticationFilter {
 		    response.addCookie(expireCookie);
         }
 
-         JoinResponseDTO tokens = jwtUtil.generateTokens(username, roles);
+         JoinResponseDTO tokens = jwtUtil.generateTokens(username, roles); // 토큰 발급
 
         // 엑세스 토큰을 헤더로 반환
         response.setHeader("Authorization", "Bearer " + tokens.accessToken());
