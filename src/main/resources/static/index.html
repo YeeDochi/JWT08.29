@@ -197,7 +197,7 @@
 
     function registerMember() {
       document.getElementById('memberRegisterResult').innerText = '';
-      fetch('http://localhost:8080/api/member/join', {
+      fetch('http://localhost:8081/api/member/join', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -223,7 +223,7 @@
 
     function registerAdmin() {
       document.getElementById('adminRegisterResult').innerText = '';
-      fetch('http://localhost:8080/api/admin/join', {
+      fetch('http://localhost:8081/api/admin/join', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -249,7 +249,7 @@
 
     function login() {
       document.getElementById('loginResult').innerText = '';
-      fetch('http://localhost:8080/login', {
+      fetch('http://localhost:8081/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -281,7 +281,7 @@
         document.getElementById('whoamiResult').innerText = '엑세스 토큰이 없습니다. 로그인 후 이용하세요.';
         return;
       }
-      fetch('http://localhost:8080/api/me', {
+      fetch('http://localhost:8081/api/me', {
         method: 'GET',
         headers: { 'Authorization': 'Bearer ' + accessToken }
       })
@@ -308,7 +308,7 @@
         return;
       }
      
-      fetch('http://localhost:8080/api/reissue', {
+      fetch('http://localhost:8081/api/reissue', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -340,7 +340,7 @@
         return;
       }
      
-      fetch('http://localhost:8080/logout', {
+      fetch('http://localhost:8081/logout', {
         method: 'POST',
         headers: { 'Authorization': 'Bearer ' +accessToken }
       })
