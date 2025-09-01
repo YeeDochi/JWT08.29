@@ -2,7 +2,7 @@ package com.example.prectice2.License.Service;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
+
 import java.security.SecureRandom;
 import java.util.Base64;
 
@@ -11,7 +11,6 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.commons.codec.binary.Base32;
 import org.springframework.stereotype.Service;
 
 
@@ -24,37 +23,32 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class LicenseService {
 
-    private static final String SECRET_KEY = "YourSuperSecretLicenseKey1234567"; 
-    
-    // GCM 모드에서 권장하는 IV(초기화 벡터) 길이 (12바이트)
-    private static final int GCM_IV_LENGTH = 12;
+    private static final String SECRET_KEY = "asdfqwefadsvfjJHJAJBUI123NBDIKA1"; //이것도 후에 프로퍼티스로 밀어넣기
 
-    // GCM 인증 태그 길이 (128비트 = 16바이트)
+    private final LicenseRepository licenseRepository;
+    // GCM IV(초기화 벡터) 길이
+    private static final int GCM_IV_LENGTH = 12;
+    // GCM 인증 태그 길이
     private static final int GCM_TAG_LENGTH = 128;
 
-    /**
-     * 라이선스 정보를 암호화하여 라이선스 코드를 생성합니다.
-     */
     public static String createLicense(LicenseEntity LE) {
-        String raw = null;
+        StringBuilder rawBuilder = new StringBuilder();
         try {
-            switch(LE.getType()){
-                case "TRIAL":
-                    raw = LE.getType()+":"+LE.getExpireDate();
-                    break;
-                case "1":
-                    raw = LE.getType()+":"+LE.getCoreCount();
-                    break;
-                case "2":
-                    raw = LE.getType()+":"+LE.getBoardSerial();
-                    break;
-                case "4":
-                    raw = LE.getType()+":"+LE.getSocketCount();
-                    break;
-                case "8":
-                    raw = LE.getType()+":"+LE.getMacAddress();
-                    break;
+            // type을 제외한 5가지 필드 비트 플래그 매핑
+            // 1: coreCount, 2: socketCount, 4: boardSerial, 8: macAddress, 16: expireDate
+            int typeInt;
+            try {
+                typeInt = Integer.parseInt(LE.getType());
+            } catch (NumberFormatException e) {
+                typeInt = 0; // type이 숫자가 아니면 아무 필드도 포함하지 않음
             }
+            rawBuilder.append(LE.getType());
+            if ((typeInt & 1) != 0) rawBuilder.append(":" + LE.getCoreCount());
+            if ((typeInt & 2) != 0) rawBuilder.append(":" + LE.getSocketCount());
+            if ((typeInt & 4) != 0) rawBuilder.append(":" + LE.getBoardSerial());
+            if ((typeInt & 8) != 0) rawBuilder.append(":" + LE.getMacAddress());
+            if ((typeInt & 16) != 0) rawBuilder.append(":" + LE.getExpireDate());
+            String raw = rawBuilder.toString();
             byte[] iv = new byte[GCM_IV_LENGTH];
             new SecureRandom().nextBytes(iv); // 안전한 IV 생성
 
@@ -66,7 +60,6 @@ public class LicenseService {
 
             byte[] encryptedData = cipher.doFinal(raw.getBytes(StandardCharsets.UTF_8));
             
-            // IV와 암호화된 데이터를 결합하여 하나의 바이트 배열로 만듭니다.
             ByteBuffer byteBuffer = ByteBuffer.allocate(iv.length + encryptedData.length);
             byteBuffer.put(iv);
             byteBuffer.put(encryptedData);
@@ -94,8 +87,6 @@ public class LicenseService {
             Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
             cipher.init(Cipher.DECRYPT_MODE, key, gcmParameterSpec);
             
-            // 복호화 과정에서 태그(HMAC 역할)가 검증됩니다. 
-            // 위변조된 코드라면 AEADBadTagException이 발생합니다.
             byte[] decryptedData = cipher.doFinal(encryptedData);
             
             return new String(decryptedData, StandardCharsets.UTF_8);
@@ -107,25 +98,22 @@ public class LicenseService {
         }
     }
 
+    // public String encoder(LicenseEntity LE) {
 
-    private final LicenseRepository licenseRepository;
-
-    public String encoder(LicenseEntity LE) {
-
-        try {
-            String raw = LE.getCoreCount() + ":" + LE.getSocketCount() + ":" + LE.getBoardSerial() + ":" + LE.getMacAddress() + ":" + LE.getExpireDate() + ":" + LE.getType();
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(raw.getBytes(StandardCharsets.UTF_8));
+    //     try {
+    //         String raw = LE.getCoreCount() + ":" + LE.getSocketCount() + ":" + LE.getBoardSerial() + ":" + LE.getMacAddress() + ":" + LE.getExpireDate() + ":" + LE.getType();
+    //         MessageDigest digest = MessageDigest.getInstance("SHA-256");
+    //         byte[] hash = digest.digest(raw.getBytes(StandardCharsets.UTF_8));
           
-            String base32 = new Base32().encodeToString(hash).replace("=", "");
+    //         String base32 = new Base32().encodeToString(hash).replace("=", "");
            
-            String serial = base32.substring(0, 16).toUpperCase();
-            String formatted = serial.replaceAll("(.{4})", "$1-").replaceAll("-$", "");
-            return formatted;
-        } catch (java.security.NoSuchAlgorithmException e) {
-            throw new RuntimeException("SHA-256 알고리즘을 사용할 수 없습니다.", e);
-        }
-    }
+    //         String serial = base32.substring(0, 16).toUpperCase();
+    //         String formatted = serial.replaceAll("(.{4})", "$1-").replaceAll("-$", "");
+    //         return formatted;
+    //     } catch (java.security.NoSuchAlgorithmException e) {
+    //         throw new RuntimeException("SHA-256 알고리즘을 사용할 수 없습니다.", e);
+    //     }
+    // }
 
     public String decoder(String licenseKey) {
         return null;
