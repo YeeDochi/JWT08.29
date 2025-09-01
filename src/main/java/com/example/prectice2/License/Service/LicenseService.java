@@ -36,9 +36,25 @@ public class LicenseService {
      * 라이선스 정보를 암호화하여 라이선스 코드를 생성합니다.
      */
     public static String createLicense(LicenseEntity LE) {
+        String raw = null;
         try {
-            String raw = LE.getCoreCount() + ":" + LE.getSocketCount() + ":" + LE.getBoardSerial() + ":" + LE.getMacAddress() + ":" + LE.getExpireDate() + ":" + LE.getType();
-           
+            switch(LE.getType()){
+                case "TRIAL":
+                    raw = LE.getType()+":"+LE.getExpireDate();
+                    break;
+                case "1":
+                    raw = LE.getType()+":"+LE.getCoreCount();
+                    break;
+                case "2":
+                    raw = LE.getType()+":"+LE.getBoardSerial();
+                    break;
+                case "4":
+                    raw = LE.getType()+":"+LE.getSocketCount();
+                    break;
+                case "8":
+                    raw = LE.getType()+":"+LE.getMacAddress();
+                    break;
+            }
             byte[] iv = new byte[GCM_IV_LENGTH];
             new SecureRandom().nextBytes(iv); // 안전한 IV 생성
 
