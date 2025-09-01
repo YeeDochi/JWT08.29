@@ -1,7 +1,7 @@
 package com.example.prectice2.Filters;
 
 
-import com.example.prectice2.DTO.JoinResponseDTO;
+import com.example.prectice2.DTO.LoginResponseDTO;
 import com.example.prectice2.DTO.LoginRequestDTO;
 import com.example.prectice2.JWT.JwtUtil;
 import com.example.prectice2.UserDetails.CustomUserDetails;
@@ -23,6 +23,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 
 import java.io.IOException;
+
+//로그인 인증 필터
 
 public class LoginFilters extends UsernamePasswordAuthenticationFilter {
 
@@ -65,7 +67,7 @@ public class LoginFilters extends UsernamePasswordAuthenticationFilter {
 		    response.addCookie(expireCookie);
         }
 
-         JoinResponseDTO tokens = jwtUtil.generateTokens(username, roles); // 토큰 발급
+        LoginResponseDTO tokens = jwtUtil.generateTokens(username, roles); // 토큰 발급
 
         // 엑세스 토큰을 헤더로 반환
         response.setHeader("Authorization", "Bearer " + tokens.accessToken());
@@ -82,5 +84,5 @@ public class LoginFilters extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
         super.unsuccessfulAuthentication(request, response, failed);
-    }
+    } // 로그인 실패시 동작, 아직 없음
 }

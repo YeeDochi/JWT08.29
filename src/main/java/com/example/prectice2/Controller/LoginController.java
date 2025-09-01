@@ -27,5 +27,5 @@ public class LoginController {
     public ResponseEntity<?> logout(Authentication authentication, HttpServletResponse response) {
         return loginService.logout(authentication.getName(), response);
     }
-    
+
 }

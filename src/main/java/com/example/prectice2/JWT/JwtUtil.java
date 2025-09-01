@@ -2,17 +2,10 @@ package com.example.prectice2.JWT;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import com.example.prectice2.DTO.JoinResponseDTO;
-import com.example.prectice2.DTO.LoginRequestDTO;
-
+import com.example.prectice2.DTO.LoginResponseDTO;
 import java.security.Key;
 import java.util.Date;
 
@@ -30,7 +23,6 @@ public class JwtUtil {
 
     private final RefreshTokenService refreshTokenService;
 
-    @Autowired
 	public JwtUtil( // 환경변수 세팅
         @Value("${spring.jwt.secret}") String secretKey,
 		@Value("${spring.jwt.expiration}") long expirationTime,
@@ -60,6 +52,7 @@ public class JwtUtil {
 				.signWith(key, SignatureAlgorithm.HS256)
 				.compact();
 	}
+
     // 리프레시 토큰 생성
     public String generateRefreshToken(String username) {
         String token = Jwts.builder()
@@ -69,7 +62,7 @@ public class JwtUtil {
                 .signWith(R_key, SignatureAlgorithm.HS256)
                 .compact();
 
-        refreshTokenService.setRefreshToken(username, token);
+        refreshTokenService.setRefreshToken(username, token); // redis에 저장
         return token;
     }
 
@@ -77,6 +70,17 @@ public class JwtUtil {
 	public String getUsername(String token) {
 		return Jwts.parserBuilder()
 				.setSigningKey(key)
+				.build()
+				.parseClaimsJws(token)
+				.getBody()
+				.getSubject();
+	}
+
+	// 리프레시 토큰에서 username 추출(role 이 없어서 별개로 만듬) 
+	// 뭔가 굉장히 오버로딩 하고싶음
+	public String R_getUsername(String token) {
+		return Jwts.parserBuilder()
+				.setSigningKey(R_key)
 				.build()
 				.parseClaimsJws(token)
 				.getBody()
@@ -93,17 +97,6 @@ public class JwtUtil {
 				.get("role");
 	}
 
-    	// 리프레시 토큰에서 username 추출
-	public String R_getUsername(String token) {
-		return Jwts.parserBuilder()
-				.setSigningKey(R_key)
-				.build()
-				.parseClaimsJws(token)
-				.getBody()
-				.getSubject();
-	}
-
-
 	// 토큰 유효성 검증
 	public boolean validateToken(String token) {
 		try {
@@ -113,20 +106,24 @@ public class JwtUtil {
 			return false;
 		}
 	}
-    public boolean validateRefreshToken(String token) {
+	// 리프레시 토큰 유효성 검증, 이것도 오버로딩 하고싶음
+    public boolean validateRefreshToken(String token) { // 리프레시 토큰에 개별 키를 사용하기에 분리됨
 		try {
-			Jwts.parserBuilder().setSigningKey(R_key).build().parseClaimsJws(token);
+			Jwts.parserBuilder().setSigningKey(R_key/* 리프레시 암호화 키 (엑세스와 다름)*/).build().parseClaimsJws(token);
 			return true;
 		} catch (JwtException | IllegalArgumentException e) {
 			return false;
 		}
 	}
-    public JoinResponseDTO generateTokens(String username, String roles){
+
+	// 토큰 쌍 생성 
+    public LoginResponseDTO generateTokens(String username, String roles){ 
         String accessToken = generateToken(username,roles);
         String refreshToken = generateRefreshToken(username);
-        return new JoinResponseDTO(accessToken, refreshToken);
+        return new LoginResponseDTO(accessToken, refreshToken);
     }
 
+	// 리프레시 토큰 서비스 반환 (redis 관련)
     public RefreshTokenService getRefreshTokenService() {
         return refreshTokenService;
     }

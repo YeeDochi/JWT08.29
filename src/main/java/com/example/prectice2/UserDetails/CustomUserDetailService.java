@@ -5,7 +5,6 @@ import com.example.prectice2.User.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,15 +17,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CustomUserDetailService implements UserDetailsService {
 
-    private UserRepository userRepository;
-
-    @Autowired
-    public CustomUserDetailService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException { // 레포지토리에서 유저디테일을 만들어줌
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException { 
+        // db에서 데이터를 뽑아 userdetail 객체를 생성
         Optional<UserEntity> userEntity = userRepository.findByUsername(username);
         if (userEntity.isPresent()) {
             UserEntity user = userEntity.get();

@@ -45,7 +45,7 @@ public class SecurityConfig {
 
     @Bean
         public SecurityFilterChain securityWebFilterChain(HttpSecurity http) throws Exception {
-                http
+                http // 기본 필터 설정 (JWT용)
                         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                         .csrf(AbstractHttpConfigurer::disable)
                         .formLogin(AbstractHttpConfigurer::disable)
@@ -59,14 +59,15 @@ public class SecurityConfig {
                                         .requestMatchers("/admin/**").hasRole("ADMIN")
                                         .anyRequest().permitAll()
                         );
-                http
+                http // 추가한 필터 설정 (1회용 인증 필터(authenticated 설정일시 사용됨)-> 로그인 필터)
                         .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, customUserDetailService), UsernamePasswordAuthenticationFilter.class)
                         .addFilterAt(new LoginFilters(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
                 return http.build();
         }
 
+        // CORS 설정
         @Bean
-        public CorsConfigurationSource corsConfigurationSource() {
+        public CorsConfigurationSource corsConfigurationSource() { 
                 CorsConfiguration configuration = new CorsConfiguration();
                 configuration.addAllowedOriginPattern("*");
                 configuration.addAllowedMethod("*");

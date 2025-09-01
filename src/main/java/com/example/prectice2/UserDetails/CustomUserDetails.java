@@ -9,6 +9,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+// 유저 디테일 객체, 시큐리티에서 기본적으로 사용하는 유저정보를 개조 유저 토큰 인증에 사용
+// 가지고 있는 유저정보로 토큰을 만들어 받은 토큰과 비교하는듯
+
 @Getter
 public class CustomUserDetails implements UserDetails {
 

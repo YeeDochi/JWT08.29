@@ -3,6 +3,8 @@ package com.example.prectice2.JWT;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+// 리프레시 토큰 저장 관련 서비스
+
 @Component
 public class RefreshTokenService {
     private final StringRedisTemplate redisTemplate;

@@ -303,6 +303,11 @@
 
     function refreshTokenFunc() {
       document.getElementById('refreshResult').innerText = '';
+      if (!accessToken) {
+        document.getElementById('refreshResult').innerText = '엑세스 토큰이 없습니다. 로그인 후 이용하세요.';
+        return;
+      }
+     
       fetch('http://localhost:8080/api/reissue', {
         method: 'POST',
         headers: {
@@ -330,6 +335,11 @@
 
     function logout() {
       document.getElementById('logoutResult').innerText = '';
+      if (!accessToken) {
+        document.getElementById('logoutResult').innerText = '엑세스 토큰이 없습니다. 로그인 후 이용하세요.';
+        return;
+      }
+     
       fetch('http://localhost:8080/logout', {
         method: 'POST',
         headers: { 'Authorization': 'Bearer ' +accessToken }

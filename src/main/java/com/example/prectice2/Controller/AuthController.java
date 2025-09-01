@@ -7,28 +7,23 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.example.prectice2.JWT.JwtUtil;
 import com.example.prectice2.Service.AuthService;
 import com.example.prectice2.User.UserEntity;
 import com.example.prectice2.User.UserRepository;
 
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api")
+// 인증, 인가 관련 컨트롤러 
+// 뭔가 많이 지저분해짐 고치고싶음
 public class AuthController {
-    private final JwtUtil jwtUtil;
+   
     private final UserRepository userRepository;
     private final AuthService authService;
-
-    @Autowired
-    public AuthController(JwtUtil jwtUtil, UserRepository userRepository, AuthService authService) {
-        this.jwtUtil = jwtUtil;
-        this.userRepository = userRepository;
-        this.authService = authService;
-    }
 
     // 권한 확인 엔드포인트
     @GetMapping("/me")

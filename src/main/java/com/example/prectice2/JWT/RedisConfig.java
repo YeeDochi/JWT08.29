@@ -5,8 +5,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+//redis 초기화 설정
 
 @Configuration
 public class RedisConfig {
@@ -15,8 +16,6 @@ public class RedisConfig {
 
     @Value("${spring.redis.port}")
     private int redisPort;
-
-    
 
     @Bean
     public LettuceConnectionFactory redisConnectionFactory() {

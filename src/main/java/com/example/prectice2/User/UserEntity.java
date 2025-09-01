@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+// 사용자 정보를 담는 엔티티
+// 뭐가 많다야..
 @Data
 @Entity
 @Table(name = "users")

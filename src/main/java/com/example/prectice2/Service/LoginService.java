@@ -12,17 +12,17 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+// 로그인 로그아웃 관련 서비스 (이름 바꿔야할지도...)
 public class LoginService {
 
     private final JwtUtil jwtUtil;
 
     public String login(LoginRequestDTO loginRequestDTO) {
-        // TODO: Implement login logic
         return "로그인 성공";
     }
 
     public ResponseEntity<?> logout(String username, HttpServletResponse response) {
-        jwtUtil.getRefreshTokenService().deleteRefreshToken(username);
+        jwtUtil.getRefreshTokenService().deleteRefreshToken(username); 
         Cookie cookie = new Cookie("refreshtoken", null);
         cookie.setHttpOnly(true);
         cookie.setPath("/");
