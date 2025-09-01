@@ -191,6 +191,43 @@
     <div id="refreshResult" class="result"></div>
     <button onclick="logout()">로그아웃</button>
     <div id="logoutResult" class="result"></div>
+    <hr>
+    <h2>라이선스 생성</h2>
+    <div class="form-row-flex">
+      <div id="licenseCreateResult" class="result"></div>
+      <div class="form-flex">
+        <div class="form-inputs">
+          <input id="coreCount" placeholder="코어 수">
+          <input id="socketCount" placeholder="소켓 수">
+          <input id="boardSerial" placeholder="보드 시리얼">
+          <input id="macAddress" placeholder="MAC 주소">
+          <input id="expireDate" placeholder="만료일 (YYYY-MM-DD)">
+          <input id="type" placeholder="라이선스 타입">
+        </div>
+        <button class="form-btn" onclick="createLicense()">라이선스 생성</button>
+      </div>
+    </div>
+    <h2>라이선스 키 조회</h2>
+    <div class="form-row-flex">
+      <div id="licenseKeyResult" class="result"></div>
+      <div class="form-flex">
+        <div class="form-inputs">
+          <input id="licenseId" placeholder="라이선스 ID">
+        </div>
+        <button class="form-btn" onclick="getLicenseKey()">라이선스 키 조회</button>
+      </div>
+    </div>
+
+    <h2>라이선스 복호화</h2>
+    <div class="form-row-flex">
+      <div id="licenseDecodeResult" class="result"></div>
+      <div class="form-flex">
+        <div class="form-inputs">
+          <input id="licenseKey" placeholder="라이선스 코드">
+        </div>
+        <button class="form-btn" onclick="decodeLicense()">복호화</button>
+      </div>
+    </div>
   </div>
   <script>
     let accessToken = "";
@@ -360,6 +397,67 @@
         document.getElementById('accessToken').innerText = "";
       })
       .catch(err => document.getElementById('logoutResult').innerText = '에러: ' + err);
+    }
+
+    function createLicense() {
+      document.getElementById('licenseCreateResult').innerText = '';
+      fetch('http://localhost:8081/license', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' +accessToken
+        },
+        body: JSON.stringify({
+          coreCount: document.getElementById('coreCount').value,
+          socketCount: document.getElementById('socketCount').value,
+          boardSerial: document.getElementById('boardSerial').value,
+          macAddress: document.getElementById('macAddress').value,
+          expireDate: document.getElementById('expireDate').value,
+          type: document.getElementById('type').value
+        })
+      })
+      .then(async res => {
+        let text = await res.text();
+        try {
+          let json = JSON.parse(text);
+          if (json.status && json.error) {
+            document.getElementById('licenseCreateResult').innerText = `[${json.status}] ${json.error}`;
+          } else {
+            document.getElementById('licenseCreateResult').innerText = JSON.stringify(json, null, 2);
+          }
+        } catch {
+          document.getElementById('licenseCreateResult').innerText = text;
+        }
+      })
+      .catch(err => document.getElementById('licenseCreateResult').innerText = '에러: ' + err);
+    }
+    // 라이선스 키 조회
+    function getLicenseKey() {
+      document.getElementById('licenseKeyResult').innerText = '';
+      const id = document.getElementById('licenseId').value;
+      fetch(`http://localhost:8081/license/${id}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + accessToken
+        }
+      })
+        .then(res => res.text())
+        .then(text => document.getElementById('licenseKeyResult').innerText = text)
+        .catch(err => document.getElementById('licenseKeyResult').innerText = '에러: ' + err);
+    }
+
+    // 라이선스 복호화
+    function decodeLicense() {
+      document.getElementById('licenseDecodeResult').innerText = '';
+      const key = document.getElementById('licenseKey').value;
+      fetch(`http://localhost:8081/license/decode?licenseKey=${encodeURIComponent(key)}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + accessToken
+        }
+      })
+        .then(res => res.text())
+        .then(text => document.getElementById('licenseDecodeResult').innerText = text)
+        .catch(err => document.getElementById('licenseDecodeResult').innerText = '에러: ' + err);
     }
   </script>
 </body>

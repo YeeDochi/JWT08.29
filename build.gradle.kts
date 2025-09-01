@@ -53,6 +53,8 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
+
+	implementation("commons-codec:commons-codec:1.16.0")
 }
 
 tasks.withType<Test> {
