@@ -11,7 +11,7 @@ services:
     ports:
       - "3307:3307"
     volumes:
-      - db_data:/var/lib/mysql2
+      - db_data:/var/lib/mysql
 
   redis:
     image: redis:7.2

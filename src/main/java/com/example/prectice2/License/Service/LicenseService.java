@@ -43,11 +43,11 @@ public class LicenseService {
                 typeInt = 0; // type이 숫자가 아니면 아무 필드도 포함하지 않음
             }
             rawBuilder.append(LE.getType());
-            if ((typeInt & 1) != 0) rawBuilder.append(":" + LE.getCoreCount());
-            if ((typeInt & 2) != 0) rawBuilder.append(":" + LE.getSocketCount());
-            if ((typeInt & 4) != 0) rawBuilder.append(":" + LE.getBoardSerial());
-            if ((typeInt & 8) != 0) rawBuilder.append(":" + LE.getMacAddress());
-            if ((typeInt & 16) != 0) rawBuilder.append(":" + LE.getExpireDate());
+            if ((typeInt & 1) != 0) rawBuilder.append("/" + LE.getCoreCount());
+            if ((typeInt & 2) != 0) rawBuilder.append("/" + LE.getSocketCount());
+            if ((typeInt & 4) != 0) rawBuilder.append("/" + LE.getBoardSerial());
+            if ((typeInt & 8) != 0) rawBuilder.append("/" + LE.getMacAddress());
+            if ((typeInt & 16) != 0) rawBuilder.append("/" + LE.getExpireDate());
             String raw = rawBuilder.toString();
             byte[] iv = new byte[GCM_IV_LENGTH];
             new SecureRandom().nextBytes(iv); // 안전한 IV 생성

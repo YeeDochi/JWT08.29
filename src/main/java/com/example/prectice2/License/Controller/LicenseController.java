@@ -37,7 +37,7 @@ public class LicenseController {
     }
 
    
-    @GetMapping("/decode")
+    @GetMapping("/admin/decode")
     public ResponseEntity<String> decodeLicense(@RequestParam String licenseKey) {
         String decoded = licenseService.validateLicense(licenseKey);
         return ResponseEntity.ok(decoded);

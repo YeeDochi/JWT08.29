@@ -55,8 +55,8 @@ public class SecurityConfig {
                         .authorizeHttpRequests(authorizeRequests ->
                                 authorizeRequests
                                         .requestMatchers("/api/admin/join","/api/member/join","/api/reissue").permitAll()
+                                        .requestMatchers("/admin/**","/license/admin/**").hasRole("ADMIN")
                                         .requestMatchers("/member/**","/api/me","/license/**","/logout").authenticated()
-                                        .requestMatchers("/admin/**").hasRole("ADMIN")
                                         .anyRequest().permitAll()
                         );
                 http // 추가한 필터 설정 (1회용 인증 필터(authenticated 설정일시 사용됨)-> 로그인 필터)

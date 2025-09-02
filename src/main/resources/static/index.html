@@ -450,7 +450,7 @@
     function decodeLicense() {
       document.getElementById('licenseDecodeResult').innerText = '';
       const key = document.getElementById('licenseKey').value;
-      fetch(`http://localhost:8081/license/decode?licenseKey=${encodeURIComponent(key)}`, {
+      fetch(`http://localhost:8081/license/admin/decode?licenseKey=${encodeURIComponent(key)}`, {
         method: 'GET',
         headers: {
           'Authorization': 'Bearer ' + accessToken
