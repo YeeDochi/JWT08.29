@@ -54,6 +54,7 @@ dependencies {
 
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
 
+	//인코딩
 	implementation("commons-codec:commons-codec:1.16.0")
 }
 
