@@ -56,21 +56,20 @@ public class LicenseData {
 
 
     // 바이트 배열로부터 LicenseData 객체 생성 (역직렬화)
-
     public static LicenseDTO fromByteArray(byte[] bytes) throws java.io.IOException {
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
         DataInputStream dis = new DataInputStream(bais);
 
         int typeInt = dis.readInt();
-    
-        // 임시 변수에 모든 가능성 있는 데이터를 순서대로 읽어들입니다.
+        
+        //임시 변수
         Short tempCoreCount = (typeInt & 1) != 0 ? dis.readShort() : null;
         Short tempSocketCount = (typeInt & 2) != 0 ? dis.readShort() : null;
         String tempBoardSerial = (typeInt & 4) != 0 ? readString(dis) : null;
         String tempMacAddress = (typeInt & 8) != 0 ? readString(dis) : null;
         Integer tempDays = (typeInt & 16) != 0 ? dis.readInt() : null;
 
-        // 최종 DTO 필드에 읽어들인 값을 할당합니다.
+        //최종 변수 -> DTO 에 들어갈 변수
         String coreCount = tempCoreCount != null ? String.valueOf(tempCoreCount) : null;
         String socketCount = tempSocketCount != null ? String.valueOf(tempSocketCount) : null;
         String boardSerial = tempBoardSerial;

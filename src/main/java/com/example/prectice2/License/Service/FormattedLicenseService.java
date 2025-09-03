@@ -47,24 +47,23 @@ public class FormattedLicenseService {
         byteBuffer.put(encryptedData);
         
         String base32Encoded = new Base32().encodeToString(byteBuffer.array());
-        
-        // --- 개선점 1 적용: 포매팅 메소드 호출 ---
-        return formatBase32ToKey(base32Encoded, 8);
+        String replacedPadding = base32Encoded.replace('=', '0');
+        return formatBase32ToKey(replacedPadding, 8); // 8개씩 포멧팅
    }
 
     public LicenseDTO decodeLicenseKey(String formattedKey) throws Exception {
-       // --- 개선점 1 적용: 포맷 제거 ---
-       String base32Encoded = formattedKey.replace("-", "").toUpperCase().replaceAll("=", "");
-       
-       byte[] finalBytes = new Base32().decode(base32Encoded);
-        // IV와 암호문 분리 (이전과 동일)
+        // 포멧 풀기
+        String base32Encoded = formattedKey.replace("-", "").toUpperCase().replaceAll("=", "");
+        String restoredBase32 = base32Encoded.replace('0', '=');
+        byte[] finalBytes = new Base32().decode(restoredBase32);
+        // IV와 암호문 분리
         ByteBuffer byteBuffer = ByteBuffer.wrap(finalBytes);
         byte[] iv = new byte[GCM_IV_LENGTH];
         byteBuffer.get(iv);
         byte[] encryptedData = new byte[byteBuffer.remaining()];
         byteBuffer.get(encryptedData);
 
-        // AES/GCM 복호화 (이전과 동일)
+        // AES/GCM 복호화
         SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(StandardCharsets.UTF_8), "AES");
         GCMParameterSpec gcmSpec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
         Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");

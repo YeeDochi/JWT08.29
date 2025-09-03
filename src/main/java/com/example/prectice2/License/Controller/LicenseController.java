@@ -3,11 +3,9 @@ package com.example.prectice2.License.Controller;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.prectice2.License.DTO.LicenseDTO;
-import com.example.prectice2.License.DTO.LicenseData;
 import com.example.prectice2.License.Entity.LicenseEntity;
 import com.example.prectice2.License.Entity.LicenseRepository;
 import com.example.prectice2.License.Service.FormattedLicenseService;
-import io.swagger.v3.oas.models.info.License;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -36,7 +34,6 @@ public class LicenseController {
         entity.setBoardSerial(dto.boardSerial());
         entity.setMacAddress(dto.macAddress());
         entity.setExpireDate(dto.expireDate());
-        // 필요하면 추가 필드도 설정
 
         LicenseEntity saved = licenseRepository.save(entity);
         return ResponseEntity.ok(saved.getId());
@@ -45,7 +42,7 @@ public class LicenseController {
     // 라이선스 키 반환
     @GetMapping("/{id}")
     public ResponseEntity<String> getLicenseKey(@PathVariable Long id) throws Exception {
-        //String licenseKey = licenseService.getLicenseKeyById(id);
+        //String licenseKey = licenseService.getLicenseKeyById(id); -- 과거의 흔적... 흑
         String formatted = formattedLicenseService.createLicenseKey(licenseRepository.findDtoById(id).orElse(null));
         return ResponseEntity.ok(formatted);
     }
