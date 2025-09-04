@@ -56,6 +56,7 @@ dependencies {
 
 	//인코딩
 	implementation("commons-codec:commons-codec:1.16.0")
+	
 }
 
 tasks.withType<Test> {

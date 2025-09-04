@@ -1,0 +1,31 @@
+sequenceDiagram
+    participant Client
+    participant LicenseController
+    participant LicenseRepository
+    participant Database
+    participant FormattedLicenseService
+    participant LicenseData
+
+    Note over Client, LicenseData: 1단계: 라이센스 데이터 저장
+    Client->>+LicenseController: POST /license (LicenseDTO 포함)
+    LicenseController->>+LicenseRepository: save(new LicenseEntity(dto))
+    LicenseRepository->>+Database: INSERT INTO licenses (...)
+    Database-->>-LicenseRepository: 저장된 엔티티(ID 포함) 반환
+    LicenseRepository-->>-LicenseController: 저장된 엔티티(ID 포함) 반환
+    LicenseController-->>-Client: 고유 ID 반환 (예: 1)
+
+    Note over Client, LicenseData: 2단계: 라이센스 키 생성
+    Client->>+LicenseController: GET /license/{id}
+    LicenseController->>+LicenseRepository: findDtoById(id)
+    LicenseRepository->>+Database: SELECT * FROM licenses WHERE id=...
+    Database-->>-LicenseRepository: 라이센스 데이터 반환
+    LicenseRepository-->>-LicenseController: LicenseDTO 반환
+    LicenseController->>+FormattedLicenseService: createLicenseKey(dto)
+    FormattedLicenseService->>+LicenseData: toByteArray()
+    Note right of LicenseData: DTO를 압축된 바이트 배열로 직렬화
+    LicenseData-->>-FormattedLicenseService: byte[] rawData 반환
+    Note right of FormattedLicenseService: 1. IV(초기화 벡터) 생성<br/>2. AES/GCM 대칭키로 rawData 암호화<br/>3. IV + 암호화된 데이터 결합
+    FormattedLicenseService->>FormattedLicenseService: formatBase32ToKey()
+     Note right of FormattedLicenseService: 1. 바이트 배열을 Base32 문자열로 인코딩<br/>2. 패딩 문자('=')를 '0'으로 교체<br/>3. 8자리마다 하이픈 삽입
+    FormattedLicenseService-->>-LicenseController: 형식화된 라이센스 키 문자열 반환
+    LicenseController-->>-Client: 최종 라이센스 키 반환

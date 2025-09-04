@@ -220,15 +220,11 @@
     </div>
 
     <h2>라이선스 복호화</h2>
-    <div class="form-row-flex">
-      <div id="licenseDecodeResult" class="result"></div>
-      <div class="form-flex">
-        <div class="form-inputs">
-          <input id="licenseKey" placeholder="라이선스 코드">
-        </div>
-        <button class="form-btn" onclick="decodeLicense()">복호화</button>
-      </div>
+    <div id="licenseDecodeResult" class="result"></div>
+    <div style="width:100%; margin-bottom:16px;">
+      <textarea id="licenseKey" placeholder="라이선스 코드" style="width:100%;height:80px;font-size:15px;resize:vertical;"></textarea>
     </div>
+    <button class="form-btn" style="width:100%;" onclick="decodeLicense()">복호화</button>
   </div>
   <script>
     let accessToken = "";
